@@ -43,7 +43,7 @@ entity generate_random_entity(){
         .dy = (rand() % 2)? dy : -dy,
         .color = {.r = rand() % 256, .g = rand() % 256, .b = rand() % 256},
     };
-    printf("Created entity: (x:%f, y:%f, dx:%d, dy:%d)\n", e.x, e.y, e.dx, e.dy);
+    //printf("Created entity: (x:%f, y:%f, dx:%d, dy:%d)\n", e.x, e.y, e.dx, e.dy);
     return e;
 }
 
@@ -52,7 +52,7 @@ void add_entity() {
         entity_array._alloc_size += 100;
         entity_array.data = realloc(entity_array.data, entity_array._alloc_size * sizeof(entity));
     }
-    printf("size: %d alloc_size: %d\n", entity_array.size, entity_array._alloc_size);
+    //printf("size: %d alloc_size: %d\n", entity_array.size, entity_array._alloc_size);
     entity_array.data[entity_array.size] = generate_random_entity();
     entity_array.size += 1;
 }
