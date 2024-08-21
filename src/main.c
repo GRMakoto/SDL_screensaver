@@ -26,16 +26,17 @@ typedef struct entity {
 } entity;
 
 struct array {
+    int _alloc_size;
     int size;
     struct entity* data;
 } entity_array;
 
 entity generate_random_entity(){
-    int dx = rand() % (130 - 20 + 1) + 20;
-    int dy = rand() % (130 - 20 + 1) + 20;
+    int dx = rand() % (130 - 25 + 1) + 25;
+    int dy = rand() % (130 - 25 + 1) + 25;
     entity e = (entity){
-        .x = rand() % (WIDTH - 20 - 20 + 1) + 20,
-        .y = rand() % (HEIGHT - 20 - 20 + 1) + 20,
+        .x = rand() % (WIDTH - 25 - 25 + 1) + 25,
+        .y = rand() % (HEIGHT - 25 - 25 + 1) + 25,
         .width = 15,
         .height = 15,
         .dx = (rand() % 2)? dx : -dx,
@@ -47,9 +48,11 @@ entity generate_random_entity(){
 }
 
 void add_entity() {
-    //TODO: Don`t realloc each time a new entity is created
-    entity_array.data = realloc(entity_array.data, (entity_array.size + 1) * sizeof(entity));
-    printf("entity_array.size: %d\n", entity_array.size);
+    if(entity_array.size + 1 >= entity_array._alloc_size) {
+        entity_array._alloc_size += 100;
+        entity_array.data = realloc(entity_array.data, entity_array._alloc_size * sizeof(entity));
+    }
+    printf("size: %d alloc_size: %d\n", entity_array.size, entity_array._alloc_size);
     entity_array.data[entity_array.size] = generate_random_entity();
     entity_array.size += 1;
 }
@@ -130,19 +133,18 @@ void process_input() {
 }
 
 void setup() {
-
-    entity_array.data = malloc(sizeof(entity));
+    entity_array.data = malloc(100 * sizeof(entity));
+    entity_array._alloc_size = 100;
     entity_array.size = 1;
     entity_array.data[0] = (entity){
-        .x = 20,
-        .y = 20,
+        .x = WIDTH / 2.0,
+        .y = HEIGHT / 2.0,
         .width = 15,
         .height = 15,
         .dx = 90,
         .dy = 90,
         .color = {.r = 255, .g = 0, .b = 255, .a = 0}
     };
-
 }
 
 
