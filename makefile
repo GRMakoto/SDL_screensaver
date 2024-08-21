@@ -1,5 +1,5 @@
 build:
-	gcc -Wall -Wpedantic -O0 ./src/*.c -lSDL2 -o game
+	gcc -Wall -Wpedantic ./src/*.c -lSDL2 -o game
 
 run:
 	./game
