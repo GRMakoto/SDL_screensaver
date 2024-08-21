@@ -1,5 +1,3 @@
-#include <SDL2/SDL_keycode.h>
-#include <SDL2/SDL_timer.h>
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <stdlib.h>
@@ -24,7 +22,7 @@ typedef struct entity {
     float height;
     int dx;
     int dy;
-    //TODO: add color
+    SDL_Color color;
 } entity;
 
 struct array {
@@ -42,6 +40,7 @@ entity generate_random_entity(){
         .height = 15,
         .dx = (rand() % 2)? dx : -dx,
         .dy = (rand() % 2)? dy : -dy,
+        .color = {.r = rand() % 256, .g = rand() % 256, .b = rand() % 256},
     };
     printf("Created entity: (x:%f, y:%f, dx:%d, dy:%d)\n", e.x, e.y, e.dx, e.dy);
     return e;
@@ -75,7 +74,7 @@ void render_entity(entity entity) {
         (int)entity.height ,
     };
 
-    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    SDL_SetRenderDrawColor(renderer, entity.color.r, entity.color.g, entity.color.b, entity.color.a);
     SDL_RenderFillRect(renderer, &entity_rect);
 }
 
@@ -141,6 +140,7 @@ void setup() {
         .height = 15,
         .dx = 90,
         .dy = 90,
+        .color = {.r = 255, .g = 0, .b = 255, .a = 0}
     };
 
 }
