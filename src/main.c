@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <time.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #define HEIGHT 600
 #define WIDTH 800
 #define FPS 60
@@ -31,7 +35,7 @@ struct array {
     struct entity* data;
 } entity_array;
 
-entity generate_random_entity(){
+entity generate_random_entity(void){
     int dx = rand() % (130 - 25 + 1) + 25;
     int dy = rand() % (130 - 25 + 1) + 25;
     entity e = (entity){
@@ -47,7 +51,7 @@ entity generate_random_entity(){
     return e;
 }
 
-void add_entity() {
+void add_entity(void) {
     if(entity_array.size + 1 >= entity_array._alloc_size) {
         entity_array._alloc_size += 100;
         entity_array.data = realloc(entity_array.data, entity_array._alloc_size * sizeof(entity));
@@ -81,9 +85,9 @@ void render_entity(entity entity) {
     SDL_RenderFillRect(renderer, &entity_rect);
 }
 
-int init() {
-    srand(time(NULL));
-    if(SDL_Init(SDL_INIT_EVERYTHING)) {
+int init(void) {
+
+    if(SDL_Init(SDL_INIT_VIDEO)) {
         perror("Error initializing SDL\n");
         return 0;
     }
@@ -107,11 +111,12 @@ int init() {
         return 0;
     }
 
+
     return 1;
 }
 
 
-void process_input() {
+void process_input(void) {
     SDL_Event event;
     SDL_PollEvent(&event);
 
@@ -132,7 +137,7 @@ void process_input() {
 
 }
 
-void setup() {
+void setup(void) {
     entity_array.data = malloc(100 * sizeof(entity));
     entity_array._alloc_size = 100;
     entity_array.size = 1;
@@ -148,8 +153,7 @@ void setup() {
 }
 
 
-void update() {
-
+void update(void) {
     if (capped_fps) {
         int time_to_wait = FRAME_TARGET_TIME - (SDL_GetTicks() - last_frame_time);
         if (time_to_wait > 0 && time_to_wait <= FRAME_TARGET_TIME) {
@@ -165,7 +169,7 @@ void update() {
 }
 
 
-void render() {
+void render(void) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
@@ -175,22 +179,31 @@ void render() {
     SDL_RenderPresent(renderer);
 }
 
-void cleanup() {
+void cleanup(void) {
     free(entity_array.data);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
 
-int main() {
-    running = init();
-    setup();
-
-    while (running) {
+void game_loop(void) {
         process_input();
         update();
         render();
+}
+
+int main(void) {
+    running = init();
+    setup();
+
+    #ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(game_loop, 0, 1);
+    #else
+    while(running) {
+        game_loop();
     }
+    #endif
+
     cleanup();
     return 0;
 }
